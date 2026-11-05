@@ -1,7 +1,7 @@
 {
   "name": "dsh-student-notebook",
-  "version": "1.1.0",
-  "description": "Student-Notebook 学生手账主题 for DeepSeek Harness：暖米色纸张、横线纸聊天区、红色边距线、活页打孔侧边栏、荧光笔高亮与胶带便利贴代码块，并提供只留页边横线的专注模式。A warm loose-leaf notebook theme for DeepSeek Harness with ruled paper, binder holes, highlighter marks, washi-taped code blocks and a gutter-only focus mode.",
+  "version": "1.2.0",
+  "description": "Student-Notebook 学生手账主题 for DeepSeek Harness：暖米色纸张、横线纸聊天区、红色边距线、活页打孔侧边栏、荧光笔高亮与胶带便利贴代码块。A warm loose-leaf notebook theme for DeepSeek Harness with ruled paper, binder holes, highlighter marks and washi-taped code blocks.",
   "type": "module",
   "main": "index.js",
   "exports": {
@@ -38,7 +38,6 @@
     "notebook",
     "student",
     "paper",
-    "focus-mode",
     "readability",
     "手账",
     "主题"

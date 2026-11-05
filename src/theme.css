@@ -685,32 +685,6 @@ kbd {
 /* Reading column gets a faint paper edge on its left. */
 [class*="V4vHZW_column"] {
   position: relative;
-  z-index: 1;
-}
-
-/* ==========================================================================
-   07b Focus mode (D)
-   The blue rules stay visible in the side gutters; a paper band behind the
-   reading column removes them from the text without masking the text itself.
-   ========================================================================== */
-
-html[data-sn-focus="on"] {
-  --sn-rule-alpha: 0.08;
-  --sn-text-halo: none;
-}
-
-html[data-sn-focus="on"] [class*="V4vHZW_column"]::before {
-  content: "";
-  position: absolute;
-  z-index: 0;
-  inset: -8px -10px;
-  pointer-events: none;
-  background: var(--sn-paper);
-}
-
-html[data-sn-focus="on"] [class*="V4vHZW_column"] > * {
-  position: relative;
-  z-index: 1;
 }
 
 /* User notes are mint sticky notes, tucked into the page. */
@@ -1326,115 +1300,6 @@ button[class*="_primary"]:not([class*="GRgSLq_primary"]):hover {
 }
 
 /* ==========================================================================
-   11b Focus mode control
-   D is a real reading mode: the reading column gets a paper band that hides
-   the blue rules, while the side gutters keep the notebook rhythm. The same
-   mode switches prose to the clearer sans stack.
-   ========================================================================== */
-
-.sn-focus-toggle {
-  position: fixed;
-  z-index: 60;
-  right: 18px;
-  bottom: max(112px, calc(var(--dsh-composer-height, 104px) + 18px));
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  height: 30px;
-  padding: 0 11px;
-  border: 1px solid var(--sn-line-strong);
-  border-radius: 999px;
-  background: rgba(253, 251, 245, 0.93);
-  box-shadow: 2px 3px 0 rgba(30, 58, 95, 0.08);
-  color: var(--sn-ink-soft);
-  font-family: var(--sn-font-sans);
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1;
-  cursor: pointer;
-  backdrop-filter: blur(6px);
-  transition:
-    background 0.14s ease,
-    border-color 0.14s ease,
-    color 0.14s ease,
-    transform 0.14s ease;
-}
-
-.sn-focus-toggle:hover {
-  border-color: var(--sn-ink-soft);
-  background: var(--sn-mint);
-  color: var(--sn-ink);
-  transform: translateY(-1px);
-}
-
-.sn-focus-toggle:active {
-  transform: translateY(1px);
-}
-
-.sn-focus-toggle[aria-pressed="true"] {
-  border-color: var(--sn-ink);
-  background: var(--sn-ink);
-  color: var(--sn-paper);
-}
-
-.sn-focus-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--sn-red);
-  box-shadow: 0 0 0 3px rgba(232, 167, 167, 0.18);
-}
-
-.sn-focus-toggle[aria-pressed="true"] .sn-focus-dot {
-  background: var(--sn-yellow);
-  box-shadow: 0 0 0 3px rgba(255, 249, 196, 0.18);
-}
-
-html[data-sn-focus="on"] [class*="_markdown_"],
-html[data-sn-focus="on"] [class*="LOmM4q_bubble"] {
-  color: #24384F;
-  font-family: var(--sn-font-sans);
-  font-weight: 500;
-}
-
-html[data-sn-focus="on"] [class*="_markdown_"] h1,
-html[data-sn-focus="on"] [class*="_markdown_"] h2,
-html[data-sn-focus="on"] [class*="_markdown_"] h3,
-html[data-sn-focus="on"] [class*="_markdown_"] h4,
-html[data-sn-focus="on"] [class*="_markdown_"] h5,
-html[data-sn-focus="on"] [class*="_markdown_"] h6 {
-  font-family: var(--sn-font-sans);
-  font-weight: 700;
-}
-
-html[data-sn-focus="on"] [class*="_markdown_"] p,
-html[data-sn-focus="on"] [class*="_markdown_"] li,
-html[data-sn-focus="on"] [class*="_markdown_"] blockquote {
-  text-shadow: none;
-}
-
-html[data-sn-focus="on"] [class*="_markdown_"] p,
-html[data-sn-focus="on"] [class*="_markdown_"] li {
-  background-color: transparent;
-  background-image: none;
-}
-
-html[data-sn-focus="on"] [class*="sidebarCol"] {
-  opacity: 0.78;
-  filter: saturate(0.72);
-  transition: opacity 0.16s ease, filter 0.16s ease;
-}
-
-html[data-sn-focus="on"] [class*="sidebarCol"]:hover {
-  opacity: 1;
-  filter: none;
-}
-
-html[data-sn-focus="on"] [class*="an3WzG_header"] {
-  opacity: 0.86;
-}
-
-/* ==========================================================================
    12  Motion & accessibility
    ========================================================================== */
 
@@ -1465,7 +1330,7 @@ html[data-sn-focus="on"] [class*="an3WzG_header"] {
   }
 }
 
-/* Narrow screens: a 28px grid, a clearer sans body, and a smaller focus pill. */
+/* Narrow screens: a 28px grid and a clearer sans body. */
 @media (max-width: 720px) {
   :root {
     --sn-rule-gap: 28px;
@@ -1532,10 +1397,5 @@ html[data-sn-focus="on"] [class*="an3WzG_header"] {
       rgba(255, 249, 196, 0.7) 88%,
       rgba(255, 249, 196, 0.4) 100%
     );
-  }
-
-  .sn-focus-toggle {
-    right: 12px;
-    bottom: max(132px, calc(var(--dsh-composer-height, 119px) + 18px));
   }
 }

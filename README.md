@@ -67,12 +67,6 @@
 - `2px` 主墨色描边、`20px` 圆角。
 - `:focus-within` 时边框加深，并出现一圈淡黄色 focus halo。
 
-**专注模式（D）**
-- 右下角「专注」按钮，或按 `Alt+Shift+F` 切换。
-- 阅读栏中央盖上一层纸色带，只保留左右页边的横线；正文切换为系统无衬线字体。
-- 侧边栏与头部降饱和度、降低存在感；鼠标移到侧边栏时恢复。
-- 状态保存在 `localStorage`，刷新后仍然保留。
-
 ---
 
 ## 安装
@@ -189,7 +183,6 @@ Harness 的 CSS Module 类名带构建哈希，因此主题优先使用：
 - **强制浅色**：即使 Harness 切到暗色模式，`body[data-ds-dark-theme]` 也会被主题的纸色覆盖，避免出现“黑纸白字”。
 - **样式顺序**：`client.js` 把 `<style>` 放到 `body` 末尾，确保晚于 Harness 自带的主题样式加载，因此不依赖 `!important` 也能覆盖 token。
 - **阅读网格**：正文、段落、列表共享 `--sn-reading-line`；段落自带局部横线纸，避免整页横线穿过字形。
-- **专注模式**：`html[data-sn-focus="on"]` 切换；按钮和 `Alt+Shift+F` 都可以控制，偏好保存在 `localStorage`。
 - **小屏字体**：`max-width: 720px` 时正文切换系统无衬线、15px、500 字重和 28px 网格。
 - **不加载外部资源**：不引用 Google Fonts、不请求图片；字体使用系统回退。
 - **减少动态**：`prefers-reduced-motion: reduce` 时关闭代码块倾斜和过渡。
