@@ -33,17 +33,20 @@
 - 边框 `1px solid #E5DDD0`，阴影使用 `2px 3px 0 rgba(0,0,0,.04)` 的硬阴影，避免“软糖”质感。
 - 全局字体：`"Comic Sans MS", "Kaiti SC", "STKaiti", "楷体", sans-serif`
 - 标题/引用：`"Noto Serif SC", "Songti SC", serif`
+- 小屏正文：`"Microsoft YaHei UI", "PingFang SC", "Noto Sans SC", system-ui, sans-serif`
 - 代码：`"Fira Code", "Source Code Pro", monospace`
 
 ### 关键组件
 
 **横线纸主聊天区**
-- `[data-conversation-scroll]` 上叠加 `repeating-linear-gradient`，每 `32px` 一条 `rgba(135,175,215,.35)` 横线。
+- `[data-conversation-scroll]` 上叠加 `repeating-linear-gradient`，每 `32px` 一条 `rgba(135,175,215,.14)` 横线。
+- 正文使用 `line-height: 32px` 的同一套网格；段落、列表、引用再各自带一层局部横线纸，避免全局横线落在半行上穿过文字。
 - 红色边距线通过 `--sn-margin-x` 计算，始终落在居中阅读栏左侧约 25px：
   ```css
   --sn-margin-x: max(28px, calc(50% - var(--dsh-chat-content-width, 748px) / 2 - 25px));
   ```
 - `background-attachment: scroll, local`：红色边距线固定在视口，横线随内容一起滚动。
+- 小屏把网格降到 `28px`，并切换系统无衬线正文字体。
 
 **活页打孔侧边栏**
 - `[class*="sidebarCol"]::before` 用多层 `radial-gradient` 画出孔洞的暗芯、牛皮纸环、纸面高光。
@@ -63,6 +66,12 @@
 **输入框**
 - `2px` 主墨色描边、`20px` 圆角。
 - `:focus-within` 时边框加深，并出现一圈淡黄色 focus halo。
+
+**专注模式（D）**
+- 右下角「专注」按钮，或按 `Alt+Shift+F` 切换。
+- 阅读栏中央盖上一层纸色带，只保留左右页边的横线；正文切换为系统无衬线字体。
+- 侧边栏与头部降饱和度、降低存在感；鼠标移到侧边栏时恢复。
+- 状态保存在 `localStorage`，刷新后仍然保留。
 
 ---
 
@@ -179,6 +188,9 @@ Harness 的 CSS Module 类名带构建哈希，因此主题优先使用：
 
 - **强制浅色**：即使 Harness 切到暗色模式，`body[data-ds-dark-theme]` 也会被主题的纸色覆盖，避免出现“黑纸白字”。
 - **样式顺序**：`client.js` 把 `<style>` 放到 `body` 末尾，确保晚于 Harness 自带的主题样式加载，因此不依赖 `!important` 也能覆盖 token。
+- **阅读网格**：正文、段落、列表共享 `--sn-reading-line`；段落自带局部横线纸，避免整页横线穿过字形。
+- **专注模式**：`html[data-sn-focus="on"]` 切换；按钮和 `Alt+Shift+F` 都可以控制，偏好保存在 `localStorage`。
+- **小屏字体**：`max-width: 720px` 时正文切换系统无衬线、15px、500 字重和 28px 网格。
 - **不加载外部资源**：不引用 Google Fonts、不请求图片；字体使用系统回退。
 - **减少动态**：`prefers-reduced-motion: reduce` 时关闭代码块倾斜和过渡。
 - **高对比模式**：`forced-colors: active` 时为 `mark` 和代码块提供系统色回退。
@@ -195,11 +207,14 @@ Harness 的 CSS Module 类名带构建哈希，因此主题优先使用：
   --sn-paper: #FDFBF5;      /* 纸张 */
   --sn-kraft: #F4EDE1;      /* 侧边栏 */
   --sn-ink: #1E3A5F;        /* 主墨色 */
-  --sn-rule-gap: 28px;      /* 横线间距 */
+  --sn-rule-gap: 32px;      /* 横线间距 */
+  --sn-reading-line: 32px;  /* 正文行高，要和横线间距一致 */
+  --sn-rule-alpha: 0.14;    /* 横线透明度 */
 }
 ```
 
-- 想换字体：只改 `--sn-font-ui`、`--sn-font-serif`、`--sn-font-code`。
+- 想换字体：改 `--sn-font-ui`、`--sn-font-serif`、`--sn-font-sans`、`--sn-font-code`。
+- 想调横线：`--sn-rule-gap` 和 `--sn-reading-line` 必须同时改（桌面 32px，小屏 28px）。
 - 想减弱胶带：把 `.md-code-block::before/::after` 的 `opacity` 调到 `0.5`。
 - 想禁用倾斜：删除 `.md-code-block` 的 `transform`，或在 `prefers-reduced-motion` 中已自动关闭。
 - 想改边距线位置：调整 `--sn-margin-x` 里的 `25px` 偏移。

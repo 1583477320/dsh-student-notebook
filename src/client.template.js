@@ -11,9 +11,29 @@ window.__ModuleLoader__.load({
 
     const STYLE_ID = 'dsh-student-notebook/student-notebook.css';
     const STYLE_SELECTOR = `style[data-plugin-css="${STYLE_ID}"]`;
+    const FOCUS_KEY = 'dsh-student-notebook:focus-mode';
+    const FOCUS_ATTR = 'data-sn-focus';
+
+    function readFocus() {
+      try {
+        return window.localStorage.getItem(FOCUS_KEY) === '1';
+      } catch {
+        return false;
+      }
+    }
+
+    function writeFocus(value) {
+      try {
+        window.localStorage.setItem(FOCUS_KEY, value ? '1' : '0');
+      } catch {
+        // Private mode or a locked-down storage policy: the toggle still works
+        // for this page, it just will not survive a reload.
+      }
+    }
 
     function mount() {
-      document.documentElement.setAttribute('data-student-notebook', 'on');
+      const root = document.documentElement;
+      root.setAttribute('data-student-notebook', 'on');
 
       let style = document.querySelector(STYLE_SELECTOR);
       if (!style) {
@@ -34,23 +54,89 @@ window.__ModuleLoader__.load({
       }
 
       let disposed = false;
+      let focusOn = readFocus();
+      let button = null;
+
+      const renderFocus = () => {
+        if (disposed) return;
+        if (focusOn) root.setAttribute(FOCUS_ATTR, 'on');
+        else root.removeAttribute(FOCUS_ATTR);
+
+        if (!button) return;
+        button.setAttribute('aria-pressed', String(focusOn));
+        button.setAttribute(
+          'aria-label',
+          focusOn ? '退出专注模式' : '进入专注模式',
+        );
+        button.title = focusOn
+          ? '退出专注模式 (Alt+Shift+F)'
+          : '专注模式 (Alt+Shift+F)';
+        const label = button.querySelector('.sn-focus-label');
+        if (label) label.textContent = focusOn ? '退出专注' : '专注';
+      };
+
+      const setFocus = (value, persist = true) => {
+        focusOn = Boolean(value);
+        renderFocus();
+        if (persist) writeFocus(focusOn);
+      };
+
+      const createButton = () => {
+        if (disposed || !document.body) return;
+
+        // A HMR pass can leave the previous button behind.
+        document.querySelectorAll('.sn-focus-toggle').forEach((node) => node.remove());
+
+        button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'sn-focus-toggle';
+        button.setAttribute('aria-keyshortcuts', 'Alt+Shift+F');
+        button.innerHTML =
+          '<span class="sn-focus-dot" aria-hidden="true"></span>' +
+          '<span class="sn-focus-label">专注</span>';
+        button.addEventListener('click', () => setFocus(!focusOn));
+        document.body.appendChild(button);
+        renderFocus();
+      };
+
+      const onKeyDown = (event) => {
+        if (
+          event.altKey &&
+          event.shiftKey &&
+          (event.key === 'f' || event.key === 'F')
+        ) {
+          event.preventDefault();
+          setFocus(!focusOn);
+        }
+      };
+
+      document.addEventListener('keydown', onKeyDown);
+      renderFocus();
+
       const moveToBody = () => {
         if (disposed || !document.body || style.parentNode === document.body) return;
         document.body.appendChild(style);
       };
+      const mountChrome = () => {
+        moveToBody();
+        createButton();
+      };
 
       if (document.body) {
-        moveToBody();
+        mountChrome();
       } else if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', moveToBody, { once: true });
+        document.addEventListener('DOMContentLoaded', mountChrome, { once: true });
       } else {
-        requestAnimationFrame(moveToBody);
+        requestAnimationFrame(mountChrome);
       }
 
       return () => {
         disposed = true;
+        document.removeEventListener('keydown', onKeyDown);
+        button?.remove();
+        root.removeAttribute(FOCUS_ATTR);
+        root.removeAttribute('data-student-notebook');
         style.remove();
-        document.documentElement.removeAttribute('data-student-notebook');
       };
     }
 

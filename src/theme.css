@@ -54,8 +54,7 @@
   /* ---- paper edges & shadows ------------------------------------------- */
   --sn-line: #E5DDD0;
   --sn-line-strong: #D8CDBB;
-  --sn-rule: rgba(135, 175, 215, 0.35);
-  --sn-rule-strong: rgba(135, 175, 215, 0.5);
+  --sn-rule-alpha: 0.14;
   --sn-radius: 12px;
   --sn-radius-sm: 8px;
   --sn-radius-pill: 20px;
@@ -65,10 +64,14 @@
   --sn-shadow-press: 1px 1px 0 rgba(0, 0, 0, 0.05);
   --sn-tape: rgba(255, 249, 196, 0.78);
   --sn-tape-edge: rgba(203, 184, 105, 0.4);
+  --sn-reading-line: 32px;
+  --sn-text-halo: 0 0 1px var(--sn-paper);
 
   /* ---- type ------------------------------------------------------------- */
   --sn-font-ui: "Comic Sans MS", "Kaiti SC", "STKaiti", "楷体", sans-serif;
   --sn-font-serif: "Noto Serif SC", "Songti SC", "STSong", "宋体", serif;
+  --sn-font-sans: "Microsoft YaHei UI", "PingFang SC", "Noto Sans SC",
+    "Segoe UI", system-ui, sans-serif;
   --sn-font-code: "Fira Code", "Source Code Pro", "SFMono-Regular", Consolas,
     "Liberation Mono", monospace;
 
@@ -667,15 +670,47 @@ kbd {
     repeating-linear-gradient(
       to bottom,
       transparent 0 calc(var(--sn-rule-gap) - 1px),
-      var(--sn-rule) calc(var(--sn-rule-gap) - 1px) var(--sn-rule-gap)
+      rgba(135, 175, 215, var(--sn-rule-alpha))
+        calc(var(--sn-rule-gap) - 1px) var(--sn-rule-gap)
     );
   background-attachment: scroll, local;
   background-repeat: no-repeat, repeat;
 }
 
+/* One ruled row per text line: the first flow item starts on a 32px grid. */
+[class*="V4vHZW_scroll"] {
+  padding-top: var(--sn-reading-line);
+}
+
 /* Reading column gets a faint paper edge on its left. */
 [class*="V4vHZW_column"] {
   position: relative;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   07b Focus mode (D)
+   The blue rules stay visible in the side gutters; a paper band behind the
+   reading column removes them from the text without masking the text itself.
+   ========================================================================== */
+
+html[data-sn-focus="on"] {
+  --sn-rule-alpha: 0.08;
+  --sn-text-halo: none;
+}
+
+html[data-sn-focus="on"] [class*="V4vHZW_column"]::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: -8px -10px;
+  pointer-events: none;
+  background: var(--sn-paper);
+}
+
+html[data-sn-focus="on"] [class*="V4vHZW_column"] > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* User notes are mint sticky notes, tucked into the page. */
@@ -693,6 +728,7 @@ kbd {
 }
 
 [class*="xMeOpW_root"] [class*="xMeOpW_body"] {
+  gap: 0;
   padding-bottom: 2px;
 }
 
@@ -719,7 +755,8 @@ kbd {
 .markdown {
   color: var(--sn-ink);
   font-family: var(--sn-font-ui);
-  line-height: 1.78;
+  font-size: var(--dsh-content-font-size, 14px);
+  line-height: var(--sn-reading-line);
 }
 
 [class*="_markdown_"] h1,
@@ -734,19 +771,35 @@ kbd {
 .markdown h4,
 .markdown h5,
 .markdown h6 {
+  width: fit-content;
+  max-width: 100%;
+  margin: var(--sn-reading-line) 0 0;
+  padding: 0 6px;
+  border-radius: 4px;
+  background-color: var(--sn-paper);
+  box-shadow: 0 0 0 6px var(--sn-paper);
   color: var(--sn-ink);
   font-family: var(--sn-font-serif);
   font-weight: 700;
   letter-spacing: 0.015em;
-  line-height: 1.4;
+  line-height: var(--sn-reading-line);
+}
+
+[class*="_markdown_"] h1:first-child,
+[class*="_markdown_"] h2:first-child,
+[class*="_markdown_"] h3:first-child,
+[class*="_markdown_"] h4:first-child,
+.markdown h1:first-child,
+.markdown h2:first-child,
+.markdown h3:first-child,
+.markdown h4:first-child {
+  margin-top: 0;
 }
 
 [class*="_markdown_"] h1,
 [class*="_markdown_"] h2,
 .markdown h1,
 .markdown h2 {
-  width: fit-content;
-  max-width: 100%;
   padding-bottom: 3px;
   background-image: linear-gradient(
     180deg,
@@ -759,13 +812,30 @@ kbd {
 
 [class*="_markdown_"] h3,
 .markdown h3 {
-  border-left: 3px solid var(--sn-red);
   padding-left: 10px;
+  border-left: 3px solid var(--sn-red);
 }
 
 [class*="_markdown_"] p,
 .markdown p {
-  margin-top: 0;
+  margin: 0 0 var(--sn-reading-line);
+  background-color: var(--sn-paper);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 calc(var(--sn-reading-line) - 1px),
+    rgba(135, 175, 215, var(--sn-rule-alpha))
+      calc(var(--sn-reading-line) - 1px) var(--sn-reading-line)
+  );
+  background-repeat: repeat;
+  background-size: 100% var(--sn-reading-line);
+  background-position: 0 0;
+  line-height: var(--sn-reading-line);
+  text-shadow: var(--sn-text-halo);
+}
+
+[class*="_markdown_"] p:last-child,
+.markdown p:last-child {
+  margin-bottom: 0;
 }
 
 [class*="_markdown_"] strong,
@@ -818,7 +888,24 @@ mark {
 [class*="_markdown_"] ol,
 .markdown ul,
 .markdown ol {
+  margin: 0 0 var(--sn-reading-line);
   padding-left: 1.35em;
+}
+
+[class*="_markdown_"] li,
+.markdown li {
+  background-color: var(--sn-paper);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 calc(var(--sn-reading-line) - 1px),
+    rgba(135, 175, 215, var(--sn-rule-alpha))
+      calc(var(--sn-reading-line) - 1px) var(--sn-reading-line)
+  );
+  background-repeat: repeat;
+  background-size: 100% var(--sn-reading-line);
+  background-position: 0 0;
+  line-height: var(--sn-reading-line);
+  text-shadow: var(--sn-text-halo);
 }
 
 [class*="_markdown_"] li::marker,
@@ -828,20 +915,22 @@ mark {
 
 [class*="_markdown_"] blockquote,
 .markdown blockquote {
-  margin: 18px 0;
-  padding: 10px 16px 10px 18px;
+  margin: 0 0 var(--sn-reading-line);
+  padding: 8px 16px 8px 18px;
   border-left: 4px solid var(--sn-red);
   border-radius: 0 var(--sn-radius) var(--sn-radius) 0;
   background: rgba(255, 249, 196, 0.34);
   color: var(--sn-ink-soft);
   font-family: var(--sn-font-serif);
   font-style: normal;
+  line-height: var(--sn-reading-line);
+  text-shadow: none;
 }
 
 [class*="_markdown_"] hr,
 .markdown hr {
   height: 0;
-  margin: 24px 0;
+  margin: var(--sn-reading-line) 0;
   border: 0;
   border-top: 1px dashed var(--sn-line-strong);
 }
@@ -849,12 +938,14 @@ mark {
 [class*="_markdown_"] table,
 .markdown table {
   width: 100%;
+  margin: 0 0 var(--sn-reading-line);
   border: 1px solid var(--sn-line);
   border-collapse: separate;
   border-spacing: 0;
   border-radius: var(--sn-radius);
   background: var(--sn-paper-raised);
   box-shadow: var(--sn-shadow);
+  text-shadow: none;
 }
 
 [class*="_markdown_"] thead th:first-child,
@@ -916,10 +1007,12 @@ mark {
 [class*="_markdown_"] img,
 .markdown img {
   max-width: 100%;
+  margin: 0 0 var(--sn-reading-line);
   border: 1px solid var(--sn-line);
   border-radius: var(--sn-radius-sm);
   box-shadow: var(--sn-shadow);
   background: var(--sn-paper-raised);
+  text-shadow: none;
 }
 
 [class*="_markdown_"] figcaption,
@@ -942,6 +1035,7 @@ code[class*="_inline"] {
   color: var(--sn-ink-deep);
   font-family: var(--sn-font-code);
   font-size: 0.88em;
+  text-shadow: none;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
@@ -957,6 +1051,7 @@ code[class*="_inline"] {
   position: relative;
   box-sizing: border-box;
   overflow: visible;
+  margin: 0 0 var(--sn-reading-line);
   transform: rotate(-0.5deg);
   transform-origin: 50% 0;
   border: 1px solid var(--sn-line-strong);
@@ -1231,6 +1326,115 @@ button[class*="_primary"]:not([class*="GRgSLq_primary"]):hover {
 }
 
 /* ==========================================================================
+   11b Focus mode control
+   D is a real reading mode: the reading column gets a paper band that hides
+   the blue rules, while the side gutters keep the notebook rhythm. The same
+   mode switches prose to the clearer sans stack.
+   ========================================================================== */
+
+.sn-focus-toggle {
+  position: fixed;
+  z-index: 60;
+  right: 18px;
+  bottom: max(112px, calc(var(--dsh-composer-height, 104px) + 18px));
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 30px;
+  padding: 0 11px;
+  border: 1px solid var(--sn-line-strong);
+  border-radius: 999px;
+  background: rgba(253, 251, 245, 0.93);
+  box-shadow: 2px 3px 0 rgba(30, 58, 95, 0.08);
+  color: var(--sn-ink-soft);
+  font-family: var(--sn-font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition:
+    background 0.14s ease,
+    border-color 0.14s ease,
+    color 0.14s ease,
+    transform 0.14s ease;
+}
+
+.sn-focus-toggle:hover {
+  border-color: var(--sn-ink-soft);
+  background: var(--sn-mint);
+  color: var(--sn-ink);
+  transform: translateY(-1px);
+}
+
+.sn-focus-toggle:active {
+  transform: translateY(1px);
+}
+
+.sn-focus-toggle[aria-pressed="true"] {
+  border-color: var(--sn-ink);
+  background: var(--sn-ink);
+  color: var(--sn-paper);
+}
+
+.sn-focus-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--sn-red);
+  box-shadow: 0 0 0 3px rgba(232, 167, 167, 0.18);
+}
+
+.sn-focus-toggle[aria-pressed="true"] .sn-focus-dot {
+  background: var(--sn-yellow);
+  box-shadow: 0 0 0 3px rgba(255, 249, 196, 0.18);
+}
+
+html[data-sn-focus="on"] [class*="_markdown_"],
+html[data-sn-focus="on"] [class*="LOmM4q_bubble"] {
+  color: #24384F;
+  font-family: var(--sn-font-sans);
+  font-weight: 500;
+}
+
+html[data-sn-focus="on"] [class*="_markdown_"] h1,
+html[data-sn-focus="on"] [class*="_markdown_"] h2,
+html[data-sn-focus="on"] [class*="_markdown_"] h3,
+html[data-sn-focus="on"] [class*="_markdown_"] h4,
+html[data-sn-focus="on"] [class*="_markdown_"] h5,
+html[data-sn-focus="on"] [class*="_markdown_"] h6 {
+  font-family: var(--sn-font-sans);
+  font-weight: 700;
+}
+
+html[data-sn-focus="on"] [class*="_markdown_"] p,
+html[data-sn-focus="on"] [class*="_markdown_"] li,
+html[data-sn-focus="on"] [class*="_markdown_"] blockquote {
+  text-shadow: none;
+}
+
+html[data-sn-focus="on"] [class*="_markdown_"] p,
+html[data-sn-focus="on"] [class*="_markdown_"] li {
+  background-color: transparent;
+  background-image: none;
+}
+
+html[data-sn-focus="on"] [class*="sidebarCol"] {
+  opacity: 0.78;
+  filter: saturate(0.72);
+  transition: opacity 0.16s ease, filter 0.16s ease;
+}
+
+html[data-sn-focus="on"] [class*="sidebarCol"]:hover {
+  opacity: 1;
+  filter: none;
+}
+
+html[data-sn-focus="on"] [class*="an3WzG_header"] {
+  opacity: 0.86;
+}
+
+/* ==========================================================================
    12  Motion & accessibility
    ========================================================================== */
 
@@ -1261,15 +1465,77 @@ button[class*="_primary"]:not([class*="GRgSLq_primary"]):hover {
   }
 }
 
-/* Narrow screens: give the paper rules a little more air and keep the
-   composer's 20px radius from colliding with the viewport edge. */
+/* Narrow screens: a 28px grid, a clearer sans body, and a smaller focus pill. */
 @media (max-width: 720px) {
+  :root {
+    --sn-rule-gap: 28px;
+    --sn-reading-line: 28px;
+    --sn-text-halo: 0 0 1px var(--sn-paper);
+  }
+
   [data-conversation-scroll],
   [class*="an3WzG_scrollBody"] {
     --sn-margin-x: 22px;
   }
 
+  [class*="V4vHZW_scroll"] {
+    padding-top: var(--sn-reading-line);
+  }
+
+  [class*="_markdown_"],
+  [class*="xMeOpW_root"],
+  [class*="LOmM4q_bubble"] {
+    color: #24384F;
+    font-family: var(--sn-font-sans);
+    font-weight: 500;
+  }
+
+  [class*="_markdown_"] {
+    font-size: max(15px, var(--dsh-content-font-size, 15px));
+  }
+
+  [class*="_markdown_"] h1,
+  [class*="_markdown_"] h2,
+  [class*="_markdown_"] h3,
+  [class*="_markdown_"] h4,
+  [class*="_markdown_"] h5,
+  [class*="_markdown_"] h6 {
+    font-family: var(--sn-font-sans);
+    font-weight: 700;
+  }
+
+  [class*="_markdown_"] p,
+  [class*="_markdown_"] li,
+  [class*="_markdown_"] blockquote {
+    line-height: var(--sn-reading-line);
+  }
+
+  [class*="_markdown_"] p {
+    margin-bottom: var(--sn-reading-line);
+  }
+
+  [class*="GRgSLq_input"],
+  [class*="GRgSLq_placeholder"] {
+    font-family: var(--sn-font-sans);
+    font-size: 15px;
+  }
+
   [class*="GRgSLq_card"] {
     border-radius: 18px;
+  }
+
+  mark {
+    background-image: linear-gradient(
+      90deg,
+      rgba(255, 249, 196, 0.44) 0%,
+      rgba(255, 249, 196, 0.78) 9%,
+      rgba(255, 249, 196, 0.7) 88%,
+      rgba(255, 249, 196, 0.4) 100%
+    );
+  }
+
+  .sn-focus-toggle {
+    right: 12px;
+    bottom: max(132px, calc(var(--dsh-composer-height, 119px) + 18px));
   }
 }

@@ -391,44 +391,20 @@ button {
   width: 100%;
 }
 
-.xMeOpW_body {
-  font-size: 14px;
-}
-
 .xMeOpW_body h2 {
-  margin: 8px 0 10px;
   font-size: 19px;
 }
 
 .xMeOpW_body h3 {
-  margin: 20px 0 8px;
   font-size: 16px;
 }
 
-.xMeOpW_body p {
-  margin: 0 0 12px;
-}
-
 .xMeOpW_body ol {
-  margin: 6px 0 14px;
   padding-left: 1.35em;
 }
 
-.xMeOpW_body li {
-  margin: 3px 0;
-}
-
-.xMeOpW_body blockquote {
-  margin: 14px 0;
-}
-
 .xMeOpW_body table {
-  margin: 8px 0 16px;
   font-size: 12.5px;
-}
-
-.xMeOpW_body .md-code-block {
-  margin: 14px 0 18px;
 }
 
 .an3WzG_composerSeat {
