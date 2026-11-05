@@ -1,0 +1,1275 @@
+/* ==========================================================================
+   Student-Notebook  ·  学生手账主题 for DeepSeek Harness
+   --------------------------------------------------------------------------
+   A warm, paper-first theme: ruled pages, a red margin line, punched binder
+   holes, highlighter marks and washi-taped code blocks.
+
+   Everything is plain CSS. Drop this file into a <style> tag (or let the
+   bundled client plugin inject it) and the Harness becomes a study notebook.
+
+   Sections
+     01  Design tokens
+     02  Harness token bridge (light + dark)
+     03  Global paper & typography
+     04  Layout shell
+     05  Sidebar / binder holes
+     06  Header
+     07  Chat paper & messages
+     08  Markdown, tables, quotes
+     09  Code blocks & tape
+     10  Composer
+     11  Menus, dialogs, misc
+     12  Motion & accessibility
+   ========================================================================== */
+
+/* ==========================================================================
+   01  Design tokens
+   ========================================================================== */
+
+:root {
+  /* ---- paper & ink ------------------------------------------------------ */
+  --sn-paper: #FDFBF5;
+  --sn-paper-raised: #FFFDF8;
+  --sn-paper-soft: #FAF4E7;
+  --sn-paper-deep: #F4EDE1;
+  --sn-kraft: #F4EDE1;
+  --sn-kraft-deep: #EDE3D3;
+  --sn-ink: #1E3A5F;
+  --sn-ink-deep: #12263F;
+  --sn-ink-soft: #3E5670;
+  --sn-ink-faint: #7A7468;
+  --sn-ink-ghost: #A69B8B;
+
+  /* ---- accents ---------------------------------------------------------- */
+  --sn-red: #E8A7A7;
+  --sn-red-deep: #C97A7A;
+  --sn-red-soft: rgba(232, 167, 167, 0.28);
+  --sn-yellow: #FFF9C4;
+  --sn-yellow-deep: #F2E58E;
+  --sn-yellow-soft: rgba(255, 249, 196, 0.58);
+  --sn-mint: #E2F0D9;
+  --sn-mint-deep: #CFE5C1;
+  --sn-mint-ink: #4F7D57;
+
+  /* ---- paper edges & shadows ------------------------------------------- */
+  --sn-line: #E5DDD0;
+  --sn-line-strong: #D8CDBB;
+  --sn-rule: rgba(135, 175, 215, 0.35);
+  --sn-rule-strong: rgba(135, 175, 215, 0.5);
+  --sn-radius: 12px;
+  --sn-radius-sm: 8px;
+  --sn-radius-pill: 20px;
+  --sn-border: 1px solid var(--sn-line);
+  --sn-shadow: 2px 3px 0 rgba(0, 0, 0, 0.04);
+  --sn-shadow-lift: 3px 5px 0 rgba(30, 58, 95, 0.08);
+  --sn-shadow-press: 1px 1px 0 rgba(0, 0, 0, 0.05);
+  --sn-tape: rgba(255, 249, 196, 0.78);
+  --sn-tape-edge: rgba(203, 184, 105, 0.4);
+
+  /* ---- type ------------------------------------------------------------- */
+  --sn-font-ui: "Comic Sans MS", "Kaiti SC", "STKaiti", "楷体", sans-serif;
+  --sn-font-serif: "Noto Serif SC", "Songti SC", "STSong", "宋体", serif;
+  --sn-font-code: "Fira Code", "Source Code Pro", "SFMono-Regular", Consolas,
+    "Liberation Mono", monospace;
+
+  /* Harness font slots. body{} re-declares these, so both are bridged below. */
+  --dsh-font-family-text: var(--sn-font-ui);
+  --dsh-font-family-text-default: var(--sn-font-ui);
+  --dsh-font-family-code: var(--sn-font-code);
+  --dsh-font-family-code-default: var(--sn-font-code);
+  --dsw-font-family-brand: var(--sn-font-serif);
+
+  /* ---- rhythm ----------------------------------------------------------- */
+  --sn-rule-gap: 32px;
+  --sn-space-1: 4px;
+  --sn-space-2: 8px;
+  --sn-space-3: 12px;
+  --sn-space-4: 16px;
+  --sn-space-5: 24px;
+  --sn-space-6: 32px;
+  color-scheme: light;
+}
+
+/* ==========================================================================
+   02  Harness token bridge
+   The Harness defines its aliases on body and re-declares them on
+   body[data-ds-dark-theme]. Matching both selectors keeps the notebook light
+   even if the app is switched to dark mode.
+   ========================================================================== */
+
+body,
+body[data-ds-dark-theme],
+html[data-ds-dark-theme] body {
+  color-scheme: light;
+
+  /* Surfaces */
+  --dsw-alias-bg-base: var(--sn-paper);
+  --dsw-alias-bg-layer-1: var(--sn-paper-raised);
+  --dsw-alias-bg-layer-2: var(--sn-paper-soft);
+  --dsw-alias-bg-layer-3: #F8F0E2;
+  --dsw-alias-bg-layer-4: #F2E7D5;
+  --dsw-alias-bg-mask-1: rgba(30, 58, 95, 0.22);
+  --dsw-alias-bg-module-platform: var(--sn-paper-soft);
+
+  /* Text */
+  --dsw-alias-label-primary: var(--sn-ink);
+  --dsw-alias-label-primary-foreground: var(--sn-paper);
+  --dsw-alias-label-secondary: var(--sn-ink-soft);
+  --dsw-alias-label-tertiary: var(--sn-ink-faint);
+  --dsw-alias-label-caption: #8A8175;
+  --dsw-alias-label-dimmed: var(--sn-ink-ghost);
+  --dsw-alias-label-error: #B4544F;
+  --dsw-alias-label-shimmer: var(--sn-line-strong);
+  --dsw-alias-link: #2C5D86;
+
+  /* Borders */
+  --dsw-alias-border-l1: #F1E9DC;
+  --dsw-alias-border-l2: #EBE2D4;
+  --dsw-alias-border-l3: var(--sn-line);
+  --dsw-alias-border-l4: var(--sn-line-strong);
+
+  /* Brand & buttons */
+  --dsw-alias-brand-primary: var(--sn-ink);
+  --dsw-alias-button-primary-fill: var(--sn-ink);
+  --dsw-alias-button-primary-hover: var(--sn-ink-deep);
+  --dsw-alias-button-tool-bar-fill: rgba(226, 240, 217, 0.7);
+  --dsw-alias-button-tool-bar-hover: var(--sn-mint);
+  --dsw-alias-button-ghost-active-fill: rgba(255, 249, 196, 0.7);
+  --dsw-alias-button-ghost-active-border: #D9C97A;
+  --dsw-alias-button-floating-fill: var(--sn-paper-raised);
+  --dsw-alias-button-floating-hover: #F4EDE1;
+
+  /* Interaction */
+  --dsw-alias-interactive-bg-hover: rgba(226, 240, 217, 0.55);
+  --dsw-alias-interactive-bg-active: rgba(255, 249, 196, 0.78);
+  --dsw-alias-interactive-bg-hover-danger: rgba(232, 167, 167, 0.22);
+
+  /* Markdown */
+  --dsw-alias-markdown-code-block: rgba(255, 249, 196, 0.52);
+  --dsw-alias-markdown-code-block-banner: rgba(255, 249, 196, 0.86);
+  --dsw-alias-markdown-inline-code: #F1E8D0;
+  --dsw-alias-markdown-tag: var(--sn-mint);
+
+  /* State */
+  --dsw-alias-state-business-primary: var(--sn-ink);
+  --dsw-alias-state-error-primary: #B4544F;
+  --dsw-alias-state-idle-primary: #8A8175;
+  --dsw-alias-state-success-primary: var(--sn-mint-ink);
+  --dsw-alias-state-success-tertiary: rgba(226, 240, 217, 0.72);
+  --dsw-alias-state-warn-primary: #8A6A1F;
+  --dsw-alias-state-warn-label: #6F5412;
+  --dsw-alias-state-warn-tertiary: rgba(255, 249, 196, 0.55);
+
+  /* Tooltip / toast */
+  --dsw-alias-toast-bg: #24384F;
+  --dsw-alias-toast-label: var(--sn-paper);
+  --dsw-alias-tooltip-bg: #24384F;
+  --dsw-alias-tooltip-key-bg: rgba(255, 255, 255, 0.16);
+  --dsw-alias-switch-thumb: var(--sn-paper-raised);
+
+  /* Scrollbars */
+  --dsw-alias-scrollbar-bg-l2: rgba(30, 58, 95, 0.18);
+  --dsw-alias-scrollbar-hover-l2: rgba(30, 58, 95, 0.32);
+
+  /* Sidebar, bubbles, menus */
+  --dsw-specific-sidebar-fill: var(--sn-kraft);
+  --dsw-specific-sidebar-nav-item-active: rgba(255, 249, 196, 0.92);
+  --dsw-specific-sidebar-nav-item-hover: rgba(226, 240, 217, 0.58);
+  --dsw-specific-sidebar-nav-item-active-accent: var(--sn-red);
+  --dsw-specific-bubble: var(--sn-mint);
+  --dsw-specific-bubble-highlight: var(--sn-mint-deep);
+  --dsw-specific-input-major: var(--sn-paper-raised);
+  --dsw-specific-login-input: var(--sn-paper-raised);
+  --dsw-specific-menu: #FCF7EC;
+  --dsw-specific-selector: var(--sn-paper-raised);
+  --dsw-specific-tip: #FBF1D3;
+
+  /* Menu / overlay material */
+  --dsw-menu-surface-fill: rgba(253, 251, 245, 0.97);
+  --dsw-menu-backdrop-filter: blur(10px) saturate(120%);
+  --dsw-hovercard-bg: var(--sn-paper-raised);
+  --dsw-alias-menu-group-header-fill: #F4EDE1;
+  --dsw-alias-menu-icon: var(--sn-ink-soft);
+
+  /* Diff */
+  --dsw-alias-code-diff-added: rgba(226, 240, 217, 0.9);
+  --dsw-alias-code-diff-deleted: rgba(232, 167, 167, 0.34);
+
+  /* Shape: measured, not bubbly. */
+  --dsw-radius-xs: 4px;
+  --dsw-radius-sm: 8px;
+  --dsw-radius-md: 12px;
+  --dsw-radius-lg: 12px;
+  --dsw-radius-xl: 16px;
+  --dsw-radius-panel: 18px;
+
+  /* Paper-stack shadows instead of soft frosted elevation. */
+  --dsw-elevation-stroke-color: var(--sn-line-strong);
+  --dsw-shadow-lv3: 2px 3px 0 rgba(30, 58, 95, 0.1);
+  --dsw-elevation-soft: 1px 2px 0 rgba(30, 58, 95, 0.05);
+  --dsw-elevation-panel: 2px 3px 0 rgba(30, 58, 95, 0.06);
+  --dsw-elevation-prominent: 3px 5px 0 rgba(30, 58, 95, 0.1);
+
+  --dsw-focus-ring-color: var(--sn-ink-deep);
+  --dsw-focus-ring-width: 2px;
+
+  /* Typography slots */
+  --dsw-font-family: var(--sn-font-ui);
+  --ds-font-family-code: var(--sn-font-code);
+  --dsw-font-markdown-code-font-family: var(--sn-font-code);
+  --dsw-font-markdown-h1-font-family: var(--sn-font-serif);
+  --dsw-font-markdown-h2-font-family: var(--sn-font-serif);
+  --dsw-font-markdown-h3-font-family: var(--sn-font-serif);
+  --dsw-font-markdown-h4-font-family: var(--sn-font-serif);
+
+  font-family: var(--sn-font-ui);
+  color: var(--sn-ink);
+  background-color: var(--sn-paper);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ==========================================================================
+   03  Global paper & typography
+   ========================================================================== */
+
+html {
+  background: var(--sn-paper);
+  color-scheme: light;
+}
+
+body {
+  background-color: var(--sn-paper);
+  color: var(--sn-ink);
+  font-family: var(--sn-font-ui);
+  letter-spacing: 0.005em;
+}
+
+/* A whisper of paper grain. Fixed and click-through, sits above the app so
+   menus and dialogs share the same stock. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+::selection {
+  background: var(--sn-yellow);
+  color: var(--sn-ink-deep);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(30, 58, 95, 0.22) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(30, 58, 95, 0.2);
+  border: 3px solid transparent;
+  border-radius: 10px;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(30, 58, 95, 0.34);
+  background-clip: padding-box;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--sn-font-code);
+}
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border: 1px solid var(--sn-line-strong);
+  border-radius: 5px;
+  background: var(--sn-paper-raised);
+  box-shadow: 0 1px 0 var(--sn-line-strong);
+  color: var(--sn-ink-soft);
+  font-size: 10px;
+  line-height: 1;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sn-ink-deep);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   04  Layout shell
+   ========================================================================== */
+
+[class*="sidebarCol"] {
+  position: relative;
+  background-color: var(--sn-kraft);
+  background-image:
+    radial-gradient(120% 46% at 8% 0%, rgba(255, 255, 255, 0.35), transparent 62%),
+    repeating-linear-gradient(
+      0deg,
+      rgba(116, 91, 58, 0.028) 0,
+      rgba(116, 91, 58, 0.028) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+  box-shadow: inset -1px 0 0 var(--sn-line);
+}
+
+[class*="centerCol"] {
+  background: var(--sn-paper);
+  box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.6);
+}
+
+/* The Harness draws a 0.5px frame edge; keep the notebook's edge warmer. */
+[class*="mP3x-q_frame"] {
+  background: var(--sn-paper);
+}
+
+/* ==========================================================================
+   05  Sidebar / binder holes
+   ========================================================================== */
+
+/* A column of punched holes down the outer edge. The ring is a dark centre,
+   a kraft rim and a paper highlight, repeated every 44px. */
+[class*="sidebarCol"]::before {
+  content: "";
+  position: absolute;
+  z-index: 4;
+  top: 18px;
+  bottom: 18px;
+  left: 2px;
+  width: 10px;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(58, 45, 30, 0.28) 0 1.6px, transparent 2.1px),
+    radial-gradient(
+      circle at 50% 46%,
+      #C7B69D 0 3.7px,
+      #8E7C66 3.9px 4.8px,
+      #F6EBD9 5px 5.5px,
+      transparent 5.8px
+    ),
+    radial-gradient(circle at 50% 64%, rgba(255, 255, 255, 0.65) 0 1.1px, transparent 1.6px);
+  background-size: 10px 44px;
+  background-repeat: repeat-y;
+  filter: drop-shadow(1px 0 0 rgba(255, 255, 255, 0.38));
+}
+
+[data-sidebar-collapsed] [class*="sidebarCol"]::before,
+[class*="sidebarCol"]:has([class*="wtg9ga_collapsed"])::before {
+  display: none;
+}
+
+/* Sidebar surface is already painted by the column; avoid a second coat. */
+[class*="sidebarCol"] [class*="wtg9ga_root"] {
+  background: transparent;
+}
+
+[class*="wtg9ga_root"] {
+  color: var(--sn-ink);
+}
+
+/* Brand row: a ruled underline and a hint of red. */
+[class*="wtg9ga_logoRow"] {
+  border-bottom: 1px dashed rgba(138, 118, 92, 0.28);
+}
+
+[class*="wtg9ga_brand"] {
+  border-radius: var(--sn-radius-sm);
+}
+
+[class*="wtg9ga_brand"]:hover {
+  background: rgba(255, 255, 255, 0.38);
+}
+
+[class*="wtg9ga_brandName"] {
+  filter: saturate(0.85);
+}
+
+/* New-session tab: a mint sticky note. */
+[class*="wtg9ga_newSession"] {
+  box-sizing: border-box;
+  border: 1px solid #C9DDBC;
+  border-radius: var(--sn-radius);
+  background: linear-gradient(180deg, #ECF6E5 0%, var(--sn-mint) 100%);
+  box-shadow: var(--sn-shadow);
+  color: var(--sn-ink);
+  font-weight: 600;
+  transition:
+    transform 0.14s ease,
+    box-shadow 0.14s ease,
+    background 0.14s ease;
+}
+
+[class*="wtg9ga_newSession"]:hover {
+  background: linear-gradient(180deg, #E7F4DE 0%, #D9EBCE 100%);
+  box-shadow: 3px 4px 0 rgba(30, 58, 95, 0.08);
+  transform: translateY(-1px);
+}
+
+[class*="wtg9ga_newSession"]:active {
+  box-shadow: var(--sn-shadow-press);
+  transform: translateY(1px);
+}
+
+/* Section labels in the sidebar: tiny, letter-spaced, with a red tick. */
+[class*="GAkraW_sectionLabel"],
+[class*="wtg9ga_panelTitle"] {
+  color: var(--sn-ink-soft);
+  font-family: var(--sn-font-serif);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+[class*="GAkraW_sectionLabel"]::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--sn-red);
+  vertical-align: 2px;
+}
+
+[class*="GAkraW_groupSection"] {
+  border-bottom: 1px dashed rgba(138, 118, 92, 0.22);
+  padding-bottom: 4px;
+}
+
+/* Project / folder rows. */
+[class*="wnFoaW_projectRow"] {
+  border-radius: var(--sn-radius-sm);
+  color: var(--sn-ink-soft);
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+[class*="wnFoaW_projectRow"]:hover {
+  background: rgba(255, 255, 255, 0.4);
+  color: var(--sn-ink);
+}
+
+[class*="wnFoaW_projectRow"] [class*="wnFoaW_title"] {
+  font-family: var(--sn-font-serif);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+[class*="wnFoaW_folder"] {
+  color: var(--sn-ink-soft);
+}
+
+[class*="wnFoaW_folderActive"] {
+  color: var(--sn-ink);
+}
+
+/* Session rows: a highlighter stripe for the active page. */
+[class*="wnFoaW_sessionRow"] {
+  box-sizing: border-box;
+  border-radius: var(--sn-radius-sm);
+  color: var(--sn-ink-soft);
+  transition:
+    background 0.12s ease,
+    color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+[class*="wnFoaW_sessionRow"]:hover {
+  background: rgba(226, 240, 217, 0.62);
+  color: var(--sn-ink);
+}
+
+[class*="wnFoaW_sessionRow"][class*="wnFoaW_selected"],
+[class*="wnFoaW_sessionRow"][aria-selected="true"] {
+  background:
+    linear-gradient(90deg, rgba(255, 249, 196, 0.94), rgba(255, 249, 196, 0.48));
+  box-shadow:
+    inset 3px 0 0 var(--sn-red),
+    var(--sn-shadow);
+  color: var(--sn-ink-deep);
+}
+
+[class*="wnFoaW_sessionRow"][class*="wnFoaW_selected"] [class*="wnFoaW_title"],
+[class*="wnFoaW_sessionRow"][aria-selected="true"] [class*="wnFoaW_title"] {
+  font-weight: 700;
+}
+
+[class*="wnFoaW_time"] {
+  color: #9A8F7E;
+  font-family: var(--sn-font-code);
+  font-size: 10px;
+}
+
+[class*="wnFoaW_iconButton"] {
+  border-radius: 7px;
+}
+
+[class*="wnFoaW_iconButton"]:hover {
+  background: rgba(255, 249, 196, 0.65);
+  color: var(--sn-ink);
+}
+
+/* Hover previews are paper cards, not dark tooltips. */
+[class*="_copyable_"][role="button"] {
+  border: 1px solid var(--sn-line);
+  border-radius: var(--sn-radius-sm);
+  background: var(--sn-paper-raised) !important;
+  box-shadow: var(--sn-shadow-lift);
+  color: var(--sn-ink) !important;
+}
+
+[class*="_copyable_"] [class*="wnFoaW_hoverTitle"] {
+  color: var(--sn-ink);
+}
+
+[class*="_copyable_"] [class*="wnFoaW_hoverPath"],
+[class*="_copyable_"] [class*="wnFoaW_hoverTime"] {
+  color: var(--sn-ink-faint);
+}
+
+/* "Load earlier" is a classless button inside the transcript; give it a
+   paper-chip treatment even when the app is in dark mode. */
+[data-conversation-scroll] [class*="V4vHZW_older"] > button {
+  padding: 4px 12px;
+  border: 1px solid var(--sn-line);
+  border-radius: 999px;
+  background: var(--sn-paper-raised) !important;
+  box-shadow: var(--sn-shadow);
+  color: var(--sn-ink-soft) !important;
+  font-family: var(--sn-font-ui);
+  font-size: 11.5px;
+}
+
+[data-conversation-scroll] [class*="V4vHZW_older"] > button:hover {
+  border-color: var(--sn-line-strong);
+  background: var(--sn-mint) !important;
+  color: var(--sn-ink) !important;
+}
+
+/* Sidebar footer / settings affordances. */
+[class*="wtg9ga_footArea"] {
+  border-top: 1px dashed rgba(138, 118, 92, 0.28);
+}
+
+[class*="wtg9ga_iconButton"]:hover {
+  background: rgba(255, 249, 196, 0.6);
+  color: var(--sn-ink);
+}
+
+/* ==========================================================================
+   06  Header
+   ========================================================================== */
+
+[class*="an3WzG_header"] {
+  position: relative;
+  background: linear-gradient(180deg, var(--sn-paper-raised) 0%, var(--sn-paper) 100%);
+  box-shadow: inset 0 -1px 0 var(--sn-line);
+}
+
+[class*="an3WzG_crumbCurrent"] {
+  color: var(--sn-ink);
+  font-family: var(--sn-font-serif);
+  font-weight: 700;
+  letter-spacing: 0.015em;
+}
+
+[class*="an3WzG_crumb"] {
+  border-radius: var(--sn-radius-sm);
+}
+
+[class*="an3WzG_tab"] {
+  font-family: var(--sn-font-ui);
+  letter-spacing: 0.02em;
+}
+
+[class*="an3WzG_tabActive"] {
+  color: var(--sn-ink-deep);
+  font-weight: 700;
+}
+
+[class*="an3WzG_tabActive"]::after {
+  height: 3px;
+  border-radius: 2px;
+  background: var(--sn-red);
+}
+
+[class*="an3WzG_headerActions"] [class*="_trigger"],
+[class*="an3WzG_headerUtilities"] button,
+[class*="an3WzG_headerCorner"] button {
+  border-radius: var(--sn-radius-sm);
+}
+
+[class*="an3WzG_headerUtilities"] button:hover,
+[class*="an3WzG_headerCorner"] button:hover {
+  background: rgba(226, 240, 217, 0.6);
+  color: var(--sn-ink);
+}
+
+/* ==========================================================================
+   07  Chat paper & messages
+   The scroll container is the sheet: 32px rules, a red margin line placed at
+   the left edge of the centred reading column, and local attachment so the
+   rules travel with the text.
+   ========================================================================== */
+
+[class*="an3WzG_root"],
+[class*="an3WzG_body"] {
+  background: var(--sn-paper);
+}
+
+[data-conversation-scroll],
+[class*="an3WzG_scrollBody"] {
+  --sn-margin-x: max(
+    28px,
+    calc(50% - var(--dsh-chat-content-width, 748px) / 2 - 25px)
+  );
+  background-color: var(--sn-paper);
+  background-image:
+    linear-gradient(
+      to right,
+      transparent 0 calc(var(--sn-margin-x) - 0.75px),
+      var(--sn-red) calc(var(--sn-margin-x) - 0.75px)
+        calc(var(--sn-margin-x) + 0.75px),
+      transparent calc(var(--sn-margin-x) + 0.75px)
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 calc(var(--sn-rule-gap) - 1px),
+      var(--sn-rule) calc(var(--sn-rule-gap) - 1px) var(--sn-rule-gap)
+    );
+  background-attachment: scroll, local;
+  background-repeat: no-repeat, repeat;
+}
+
+/* Reading column gets a faint paper edge on its left. */
+[class*="V4vHZW_column"] {
+  position: relative;
+}
+
+/* User notes are mint sticky notes, tucked into the page. */
+[class*="LOmM4q_bubble"] {
+  border: 1px solid #C9DEBD;
+  border-radius: var(--sn-radius) var(--sn-radius) 4px var(--sn-radius);
+  background: linear-gradient(180deg, #EAF5E3 0%, var(--sn-mint) 100%);
+  box-shadow: var(--sn-shadow);
+  color: var(--sn-ink-deep);
+}
+
+/* Assistant prose sits directly on the ruled paper. */
+[class*="xMeOpW_root"] {
+  color: var(--sn-ink);
+}
+
+[class*="xMeOpW_root"] [class*="xMeOpW_body"] {
+  padding-bottom: 2px;
+}
+
+/* Timestamps and meta labels become pencil annotations. */
+[class*="LOmM4q_meta"],
+[class*="LOmM4q_time"],
+[class*="xMeOpW_meta"] {
+  color: var(--sn-ink-ghost);
+  font-family: var(--sn-font-code);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+}
+
+/* "Thinking" / process strips read as a light pencil box. */
+[class*="BE0jCW_"] {
+  color: var(--sn-ink-faint);
+}
+
+/* ==========================================================================
+   08  Markdown, tables, quotes
+   ========================================================================== */
+
+[class*="_markdown_"],
+.markdown {
+  color: var(--sn-ink);
+  font-family: var(--sn-font-ui);
+  line-height: 1.78;
+}
+
+[class*="_markdown_"] h1,
+[class*="_markdown_"] h2,
+[class*="_markdown_"] h3,
+[class*="_markdown_"] h4,
+[class*="_markdown_"] h5,
+[class*="_markdown_"] h6,
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown h5,
+.markdown h6 {
+  color: var(--sn-ink);
+  font-family: var(--sn-font-serif);
+  font-weight: 700;
+  letter-spacing: 0.015em;
+  line-height: 1.4;
+}
+
+[class*="_markdown_"] h1,
+[class*="_markdown_"] h2,
+.markdown h1,
+.markdown h2 {
+  width: fit-content;
+  max-width: 100%;
+  padding-bottom: 3px;
+  background-image: linear-gradient(
+    180deg,
+    transparent 0 62%,
+    rgba(255, 249, 196, 0.92) 62% 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+[class*="_markdown_"] h3,
+.markdown h3 {
+  border-left: 3px solid var(--sn-red);
+  padding-left: 10px;
+}
+
+[class*="_markdown_"] p,
+.markdown p {
+  margin-top: 0;
+}
+
+[class*="_markdown_"] strong,
+.markdown strong {
+  color: var(--sn-ink-deep);
+  font-weight: 700;
+}
+
+[class*="_markdown_"] em,
+.markdown em {
+  color: var(--sn-ink-soft);
+}
+
+[class*="_markdown_"] a,
+.markdown a {
+  color: #2C5D86;
+  text-decoration-color: rgba(201, 122, 122, 0.75);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+[class*="_markdown_"] a:hover,
+.markdown a:hover {
+  color: var(--sn-ink-deep);
+  text-decoration-color: var(--sn-red-deep);
+}
+
+/* The requested highlighter: only the bottom 40% of the line is painted, with
+   a slightly uneven marker edge and cloned boxes across line breaks. */
+mark {
+  color: inherit;
+  padding: 0 0.12em;
+  border-radius: 2px;
+  background-color: transparent;
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 249, 196, 0.58) 0%,
+    rgba(255, 249, 196, 0.96) 9%,
+    rgba(255, 249, 196, 0.9) 88%,
+    rgba(255, 249, 196, 0.52) 100%
+  );
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 40%;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+[class*="_markdown_"] ul,
+[class*="_markdown_"] ol,
+.markdown ul,
+.markdown ol {
+  padding-left: 1.35em;
+}
+
+[class*="_markdown_"] li::marker,
+.markdown li::marker {
+  color: var(--sn-red-deep);
+}
+
+[class*="_markdown_"] blockquote,
+.markdown blockquote {
+  margin: 18px 0;
+  padding: 10px 16px 10px 18px;
+  border-left: 4px solid var(--sn-red);
+  border-radius: 0 var(--sn-radius) var(--sn-radius) 0;
+  background: rgba(255, 249, 196, 0.34);
+  color: var(--sn-ink-soft);
+  font-family: var(--sn-font-serif);
+  font-style: normal;
+}
+
+[class*="_markdown_"] hr,
+.markdown hr {
+  height: 0;
+  margin: 24px 0;
+  border: 0;
+  border-top: 1px dashed var(--sn-line-strong);
+}
+
+[class*="_markdown_"] table,
+.markdown table {
+  width: 100%;
+  border: 1px solid var(--sn-line);
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: var(--sn-radius);
+  background: var(--sn-paper-raised);
+  box-shadow: var(--sn-shadow);
+}
+
+[class*="_markdown_"] thead th:first-child,
+.markdown thead th:first-child {
+  border-top-left-radius: var(--sn-radius);
+}
+
+[class*="_markdown_"] thead th:last-child,
+.markdown thead th:last-child {
+  border-top-right-radius: var(--sn-radius);
+}
+
+[class*="_markdown_"] tbody tr:last-child td:first-child,
+.markdown tbody tr:last-child td:first-child {
+  border-bottom-left-radius: var(--sn-radius);
+}
+
+[class*="_markdown_"] tbody tr:last-child td:last-child,
+.markdown tbody tr:last-child td:last-child {
+  border-bottom-right-radius: var(--sn-radius);
+}
+
+[class*="_markdown_"] thead th,
+.markdown thead th {
+  background: linear-gradient(180deg, #EDF6E6 0%, var(--sn-mint) 100%);
+  color: var(--sn-ink-deep);
+  font-family: var(--sn-font-serif);
+  font-weight: 700;
+  border-bottom: 1px solid #C9DEBD;
+}
+
+[class*="_markdown_"] th,
+[class*="_markdown_"] td,
+.markdown th,
+.markdown td {
+  padding: 8px 12px;
+  border-right: 1px dashed rgba(229, 221, 208, 0.9);
+  border-bottom: 1px solid rgba(229, 221, 208, 0.75);
+  vertical-align: top;
+}
+
+[class*="_markdown_"] tr:last-child td,
+.markdown tr:last-child td {
+  border-bottom: 0;
+}
+
+[class*="_markdown_"] th:last-child,
+[class*="_markdown_"] td:last-child,
+.markdown th:last-child,
+.markdown td:last-child {
+  border-right: 0;
+}
+
+[class*="_markdown_"] tbody tr:nth-child(even),
+.markdown tbody tr:nth-child(even) {
+  background: rgba(255, 249, 196, 0.16);
+}
+
+[class*="_markdown_"] img,
+.markdown img {
+  max-width: 100%;
+  border: 1px solid var(--sn-line);
+  border-radius: var(--sn-radius-sm);
+  box-shadow: var(--sn-shadow);
+  background: var(--sn-paper-raised);
+}
+
+[class*="_markdown_"] figcaption,
+.markdown figcaption {
+  color: var(--sn-ink-faint);
+  font-family: var(--sn-font-serif);
+  font-size: 12px;
+  font-style: italic;
+  text-align: center;
+}
+
+/* Inline code: a small typed label. */
+[class*="_markdown_"] :not(pre) > code,
+.markdown :not(pre) > code,
+code[class*="_inline"] {
+  padding: 1px 5px;
+  border: 1px solid var(--sn-line);
+  border-radius: 4px;
+  background: #F4ECD8;
+  color: var(--sn-ink-deep);
+  font-family: var(--sn-font-code);
+  font-size: 0.88em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* ==========================================================================
+   09  Code blocks & tape
+   Each block is a sheet of yellow paper taped into the notebook. The tilt is
+   deliberately tiny; hovering straightens it so long code stays readable.
+   ========================================================================== */
+
+.md-code-block,
+[data-code-wrap="true"] {
+  position: relative;
+  box-sizing: border-box;
+  overflow: visible;
+  transform: rotate(-0.5deg);
+  transform-origin: 50% 0;
+  border: 1px solid var(--sn-line-strong);
+  border-radius: var(--sn-radius);
+  background-color: rgba(255, 249, 196, 0.36);
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 249, 196, 0.72) 0%,
+    rgba(255, 249, 196, 0.46) 100%
+  );
+  box-shadow: var(--sn-shadow-lift);
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+/* Washi tape at both upper corners. */
+.md-code-block::before,
+.md-code-block::after {
+  content: "";
+  position: absolute;
+  top: -8px;
+  z-index: 1;
+  width: 66px;
+  height: 18px;
+  pointer-events: none;
+  border: 1px solid var(--sn-tape-edge);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35), transparent 45%),
+    linear-gradient(90deg, rgba(255, 249, 196, 0.62), rgba(246, 233, 140, 0.86));
+  box-shadow: 0 1px 2px rgba(30, 58, 95, 0.08);
+  opacity: 0.92;
+}
+
+.md-code-block::before {
+  left: 18px;
+  transform: rotate(-4deg);
+}
+
+.md-code-block::after {
+  right: 18px;
+  transform: rotate(3.5deg);
+}
+
+@media (hover: hover) {
+  .md-code-block:hover {
+    transform: rotate(0deg);
+    box-shadow: 4px 6px 0 rgba(30, 58, 95, 0.1);
+  }
+}
+
+/* Banner is translucent so the tape and paper read as one object. */
+[data-code-block-banner] {
+  position: relative;
+  z-index: 2;
+  border-bottom: 1px dashed rgba(168, 146, 76, 0.35);
+  border-radius: var(--sn-radius) var(--sn-radius) 0 0;
+  background: rgba(255, 249, 196, 0.5);
+  color: var(--sn-ink-soft);
+}
+
+[data-code-block-banner] [class*="_language"] {
+  color: #7A6420;
+  font-family: var(--sn-font-code);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+}
+
+[data-code-block-banner] button {
+  border-radius: 6px;
+  color: var(--sn-ink-soft);
+}
+
+[data-code-block-banner] button:hover {
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--sn-ink);
+}
+
+[data-code-block-content] {
+  border-radius: 0 0 var(--sn-radius) var(--sn-radius);
+}
+
+.md-code-block pre,
+.md-code-block pre code {
+  background: transparent;
+  color: var(--sn-ink-deep);
+  font-family: var(--sn-font-code);
+  font-size: max(12px, var(--dsh-code-font-size, 12.5px));
+  line-height: 1.65;
+}
+
+.md-code-block pre {
+  margin: 0;
+  padding: 12px 14px 14px;
+}
+
+/* Copy / wrap buttons active state. */
+[data-code-block-banner] button[aria-pressed="true"] {
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--sn-ink);
+}
+
+/* ==========================================================================
+   10  Composer
+   A 2px ink-edged writing slip with a 20px radius and a hard paper shadow.
+   ========================================================================== */
+
+[class*="GRgSLq_card"],
+[data-composer-seat] [class*="GRgSLq_card"] {
+  box-sizing: border-box;
+  border: 2px solid var(--sn-ink);
+  border-radius: var(--sn-radius-pill);
+  background: var(--sn-paper-raised);
+  box-shadow: 3px 4px 0 rgba(30, 58, 95, 0.08);
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+[class*="GRgSLq_card"]:focus-within,
+[data-composer-seat] [class*="GRgSLq_card"]:focus-within {
+  border-color: var(--sn-ink-deep);
+  box-shadow:
+    3px 4px 0 rgba(30, 58, 95, 0.13),
+    0 0 0 3px rgba(255, 249, 196, 0.55);
+}
+
+[class*="GRgSLq_input"] {
+  color: var(--sn-ink);
+  font-family: var(--sn-font-ui);
+  font-size: 14.5px;
+  line-height: 1.7;
+  caret-color: var(--sn-ink);
+}
+
+[class*="GRgSLq_placeholder"] {
+  color: #A1988A;
+  font-family: var(--sn-font-ui);
+  font-style: italic;
+}
+
+[class*="GRgSLq_row"] {
+  border-top: 1px dashed rgba(216, 205, 187, 0.7);
+}
+
+[class*="GRgSLq_add"] {
+  border: 1px dashed var(--sn-line-strong);
+  border-radius: 50%;
+  background: var(--sn-paper);
+  color: var(--sn-ink-soft);
+}
+
+[class*="GRgSLq_add"]:hover {
+  border-color: var(--sn-ink-soft);
+  background: var(--sn-mint);
+  color: var(--sn-ink);
+}
+
+[class*="GRgSLq_primary"] {
+  border: 1px solid var(--sn-ink);
+  border-radius: 50%;
+  background: var(--sn-ink);
+  box-shadow: 1px 2px 0 rgba(30, 58, 95, 0.2);
+  color: var(--sn-paper);
+}
+
+[class*="GRgSLq_primary"]:hover {
+  background: var(--sn-ink-deep);
+  border-color: var(--sn-ink-deep);
+}
+
+[class*="GRgSLq_primary"]:active {
+  box-shadow: none;
+  transform: translateY(1px);
+}
+
+/* Access / model chips in the composer are paper labels. */
+[class*="GRgSLq_row"] button:not([class*="GRgSLq_primary"]) {
+  border-radius: 8px;
+}
+
+[class*="GRgSLq_row"] button:not([class*="GRgSLq_primary"]):hover {
+  background: rgba(226, 240, 217, 0.6);
+}
+
+/* ==========================================================================
+   11  Menus, dialogs, misc
+   ========================================================================== */
+
+[data-menu-material],
+[class*="_surface_"][data-menu-material] {
+  border: 1px solid var(--sn-line);
+  border-radius: var(--sn-radius);
+  background: var(--dsw-menu-surface-fill);
+  box-shadow: var(--sn-shadow-lift);
+}
+
+[role="dialog"] {
+  border: 1px solid var(--sn-line);
+  border-radius: var(--sn-radius);
+  background: var(--sn-paper);
+  box-shadow: 4px 6px 0 rgba(30, 58, 95, 0.1);
+}
+
+[role="dialog"] h1,
+[role="dialog"] h2,
+[role="dialog"] h3 {
+  font-family: var(--sn-font-serif);
+  color: var(--sn-ink);
+}
+
+[role="dialog"] p {
+  color: var(--sn-ink-soft);
+}
+
+[class*="_mask_"] {
+  background: rgba(30, 58, 95, 0.18);
+  backdrop-filter: blur(2px) saturate(105%);
+}
+
+/* Primary buttons everywhere except the round composer send button. */
+button[class*="_primary"]:not([class*="GRgSLq_primary"]) {
+  border-radius: var(--sn-radius);
+  background: var(--sn-ink);
+  color: var(--sn-paper);
+  box-shadow: var(--sn-shadow);
+}
+
+button[class*="_primary"]:not([class*="GRgSLq_primary"]):hover {
+  background: var(--sn-ink-deep);
+}
+
+[data-composer-seat] [class*="GRgSLq_primary"] {
+  border-radius: 50%;
+}
+
+/* Generic cards and selected list rows pick up the paper edge. */
+[class*="_card"] {
+  border-color: var(--sn-line);
+}
+
+[class*="_tab_"][aria-selected="true"],
+[class*="_tab_"][aria-selected="true"]:hover {
+  color: var(--sn-ink-deep);
+}
+
+[class*="_tab_"]::after {
+  background: var(--sn-yellow);
+}
+
+/* Tooltips: ink on paper, like a stamp. */
+[role="tooltip"] {
+  border: 1px solid var(--sn-line-strong);
+  border-radius: 6px;
+  background: #24384F;
+  color: var(--sn-paper);
+  box-shadow: var(--sn-shadow);
+  font-family: var(--sn-font-ui);
+}
+
+/* Toast. */
+[class*="_toast"] {
+  border: 1px solid var(--sn-line-strong);
+  border-radius: var(--sn-radius);
+  background: #24384F;
+  color: var(--sn-paper);
+  box-shadow: var(--sn-shadow-lift);
+}
+
+/* Command palette / search rows. */
+[role="listbox"] [role="option"][aria-selected="true"],
+[role="option"]:hover {
+  border-radius: var(--sn-radius-sm);
+  background: rgba(255, 249, 196, 0.55);
+}
+
+/* ==========================================================================
+   12  Motion & accessibility
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .md-code-block,
+  .md-code-block:hover {
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  mark {
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  .md-code-block {
+    border: 1px solid CanvasText;
+  }
+}
+
+/* Narrow screens: give the paper rules a little more air and keep the
+   composer's 20px radius from colliding with the viewport edge. */
+@media (max-width: 720px) {
+  [data-conversation-scroll],
+  [class*="an3WzG_scrollBody"] {
+    --sn-margin-x: 22px;
+  }
+
+  [class*="GRgSLq_card"] {
+    border-radius: 18px;
+  }
+}

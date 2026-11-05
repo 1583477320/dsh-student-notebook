@@ -1,0 +1,73 @@
+{
+  "name": "dsh-student-notebook",
+  "version": "1.0.0",
+  "description": "Student-Notebook 学生手账主题 for DeepSeek Harness：暖米色纸张、横线纸聊天区、红色边距线、活页打孔侧边栏、荧光笔高亮与胶带便利贴代码块。A warm loose-leaf notebook theme for DeepSeek Harness with ruled paper, binder holes, highlighter marks and washi-taped code blocks.",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./theme.css": "./student-notebook.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "student-notebook.css",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "LICENSE",
+    "preview.html",
+    "preview.css",
+    "preview.png",
+    "build.mjs",
+    "src/theme.css",
+    "src/client.template.js"
+  ],
+  "keywords": [
+    "deepseek",
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "client-plugin",
+    "theme",
+    "notebook",
+    "student",
+    "paper",
+    "手账",
+    "主题"
+  ],
+  "author": "zhuyuelei <1583477320@qq.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/1583477320/dsh-student-notebook#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/1583477320/dsh-student-notebook.git"
+  },
+  "bugs": {
+    "url": "https://github.com/1583477320/dsh-student-notebook/issues"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "prepublishOnly": "node build.mjs"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  }
+}

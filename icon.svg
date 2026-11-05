@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Student Notebook">
+  <defs>
+    <clipPath id="paper">
+      <rect x="9" y="6" width="46" height="52" rx="7"/>
+    </clipPath>
+    <filter id="lift" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="1.5" dy="2.5" stdDeviation="0" flood-color="#1E3A5F" flood-opacity="0.14"/>
+    </filter>
+  </defs>
+
+  <!-- paper -->
+  <rect x="9" y="6" width="46" height="52" rx="7" fill="#FDFBF5" stroke="#D8CDBB" stroke-width="1.4" filter="url(#lift)"/>
+
+  <!-- ruled lines + red margin -->
+  <g clip-path="url(#paper)" opacity="0.95">
+    <path d="M22 11V53" stroke="#E8A7A7" stroke-width="1.3"/>
+    <path d="M13 20H51M13 28H51M13 36H51M13 44H51" stroke="#AFC6DB" stroke-width="1" opacity="0.85"/>
+    <rect x="25" y="32" width="20" height="5" rx="1" fill="#FFF9C4"/>
+    <path d="M26 46c3-.6 5 .4 8 0s4-1 7-.4" stroke="#1E3A5F" stroke-width="1.2" stroke-linecap="round" opacity="0.55"/>
+  </g>
+
+  <!-- punched holes -->
+  <g fill="#EFE5D5" stroke="#A9977F" stroke-width="1">
+    <circle cx="15" cy="17" r="2.3"/>
+    <circle cx="15" cy="31" r="2.3"/>
+    <circle cx="15" cy="45" r="2.3"/>
+  </g>
+
+  <!-- washi tape -->
+  <g transform="rotate(-6 44 9)">
+    <rect x="37" y="4" width="17" height="8" rx="1" fill="#FFF9C4" stroke="#CBB869" stroke-opacity="0.5"/>
+    <path d="M39 6.5h13M38.5 9.5h13" stroke="#E3D27A" stroke-width="0.7" opacity="0.8"/>
+  </g>
+
+  <!-- ink nib -->
+  <path d="M49 48l5-5 2 2-5 5-3 1z" fill="#1E3A5F"/>
+  <path d="M49 48l-1 3 3-1z" fill="#E8A7A7"/>
+</svg>
