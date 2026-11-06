@@ -350,7 +350,6 @@ kbd {
 
 [class*="centerCol"] {
   background: var(--sn-paper);
-  box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.6);
 }
 
 /* The Harness draws a 0.5px frame edge; keep the notebook's edge warmer. */
