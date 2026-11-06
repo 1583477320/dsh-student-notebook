@@ -1,6 +1,6 @@
 # Student-Notebook · 学生手账
 
-> 一个给 DeepSeek Harness 的现代活页手账主题：暖米色纸张、32px 横线纸、红色边距线、活页打孔、荧光笔高亮、和纸胶带代码块。
+> 一个给 DeepSeek Harness 的现代手账主题：暖米色纸张、32px 横线纸、红色边距线、纸边装订、页码/日期、索引贴、纸夹与阅读进度。
 
 ![Student-Notebook preview](preview.png)
 
@@ -48,10 +48,15 @@
 - `background-attachment: scroll, local`：红色边距线固定在视口，横线随内容一起滚动。
 - 小屏把网格降到 `28px`，并切换系统无衬线正文字体。
 
-**活页打孔侧边栏**
-- `[class*="sidebarCol"]::before` 用多层 `radial-gradient` 画出孔洞的暗芯、牛皮纸环、纸面高光。
-- 每 `44px` 重复一次；折叠成 56px 窄栏时自动隐藏。
-- `pointer-events: none`，不会挡住点击。
+**纸边装订 / 页边组件**
+- 侧边栏不再打孔，也去掉了右侧纸边；它只负责导航。
+- 唯一装订线在正文纸左侧：虚线、孔位、纸色高光；红色页边线在它右侧。
+- 页边栏由 `client.js` 注入到阅读列，包含：
+  - **A** 日期、动态页码
+  - **B** 右侧「定义 / 步骤 / 判别」索引贴
+  - **C** 纸夹与和纸胶带
+  - **E** 阅读进度圆点与 `P.1–P.12` 页码
+- 页边栏固定在滚动视口内，滚动时页码和进度同步更新；宽度低于 `1120px` 时整体隐藏，避免挤压正文。
 
 **荧光笔 `<mark>`**
 - 只画下半部分：`background-size: 100% 40%; background-position: 0 100%;`
@@ -166,7 +171,7 @@ node build.mjs
 
 ### 本地预览
 
-直接用浏览器打开 `preview.html`。它使用与 Harness 相同的语义类名（`an3WzG_*`、`GRgSLq_*`、`md-code-block`、`wnFoaW_*`），可以在不启动 DSH 的情况下检查纸张、边距线、打孔、胶带和输入框。
+直接用浏览器打开 `preview.html`。它使用与 Harness 相同的语义类名（`an3WzG_*`、`GRgSLq_*`、`md-code-block`、`wnFoaW_*`），可以在不启动 DSH 的情况下检查纸张、纸边装订、页边组件、胶带和输入框。
 
 ---
 
@@ -183,6 +188,7 @@ Harness 的 CSS Module 类名带构建哈希，因此主题优先使用：
 - **强制浅色**：即使 Harness 切到暗色模式，`body[data-ds-dark-theme]` 也会被主题的纸色覆盖，避免出现“黑纸白字”。
 - **样式顺序**：`client.js` 把 `<style>` 放到 `body` 末尾，确保晚于 Harness 自带的主题样式加载，因此不依赖 `!important` 也能覆盖 token。
 - **阅读网格**：正文、段落、列表共享 `--sn-reading-line`；段落自带局部横线纸，避免整页横线穿过字形。
+- **页边组件**：`client.js` 把日期、页码、索引贴、纸夹、胶带和进度栏注入阅读列；位置随列宽/滚动更新，卸载时移除。
 - **小屏字体**：`max-width: 720px` 时正文切换系统无衬线、15px、500 字重和 28px 网格。
 - **不加载外部资源**：不引用 Google Fonts、不请求图片；字体使用系统回退。
 - **减少动态**：`prefers-reduced-motion: reduce` 时关闭代码块倾斜和过渡。

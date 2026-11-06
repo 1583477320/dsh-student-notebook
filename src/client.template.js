@@ -11,6 +11,183 @@ window.__ModuleLoader__.load({
 
     const STYLE_ID = 'dsh-student-notebook/student-notebook.css';
     const STYLE_SELECTOR = `style[data-plugin-css="${STYLE_ID}"]`;
+    const RAIL_CLASS = 'sn-page-rail';
+    const COLUMN_SELECTOR = '[class*="V4vHZW_column"]';
+    const FLOW_SELECTOR = '[class*="V4vHZW_flowItem"]';
+
+    const DEFAULT_TABS = ['定义', '步骤', '判别'];
+
+    function formatDate(date) {
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const weekday = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][date.getDay()];
+      return `${month}.${day} / ${weekday}`;
+    }
+
+    function createRail(column) {
+      const rail = document.createElement('div');
+      rail.className = RAIL_CLASS;
+      rail.setAttribute('aria-hidden', 'true');
+      rail.innerHTML = `
+        <span class="sn-binding"></span>
+        <span class="sn-page-date"></span>
+        <span class="sn-page-number"></span>
+        <span class="sn-index-tabs">
+          <span class="sn-index-tab">定义</span>
+          <span class="sn-index-tab">步骤</span>
+          <span class="sn-index-tab">判别</span>
+        </span>
+        <span class="sn-page-clip">
+          <svg viewBox="0 0 28 58" width="26" height="56" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 12v34a6 6 0 0 0 12 0V15a4 4 0 0 0-8 0v30a2.5 2.5 0 0 0 5 0V19" stroke="#7C8A94" stroke-width="2" stroke-linecap="round"></path>
+            <path d="M8 12a5 5 0 0 1 10 0v7" stroke="#B8C4CC" stroke-width="1.1" stroke-linecap="round"></path>
+          </svg>
+        </span>
+        <span class="sn-page-tape"></span>
+        <span class="sn-progress">
+          <span class="sn-progress-dot"></span>
+          <span class="sn-progress-dot"></span>
+          <span class="sn-progress-dot"></span>
+          <span class="sn-progress-dot"></span>
+          <span class="sn-progress-dot"></span>
+          <b>1/12</b>
+        </span>
+      `;
+      const date = rail.querySelector('.sn-page-date');
+      if (date) date.textContent = formatDate(new Date());
+      column.prepend(rail);
+      return rail;
+    }
+
+    function updateRail(column, rail) {
+      const scroll =
+        column.closest('[data-conversation-scroll]') ||
+        column.closest('[class*="an3WzG_scrollBody"]');
+
+      if (!scroll) {
+        rail.style.visibility = 'hidden';
+        return;
+      }
+
+      const scrollRect = scroll.getBoundingClientRect();
+      const columnRect = column.getBoundingClientRect();
+      const visible =
+        scrollRect.height > 100 &&
+        columnRect.width > 200 &&
+        scrollRect.bottom > 0 &&
+        scrollRect.top < window.innerHeight;
+
+      rail.style.visibility = visible ? 'visible' : 'hidden';
+      if (!visible) return;
+
+      rail.style.left = `${Math.round(columnRect.left)}px`;
+      rail.style.top = `${Math.round(scrollRect.top)}px`;
+      rail.style.width = `${Math.round(columnRect.width)}px`;
+      rail.style.height = `${Math.round(scrollRect.height)}px`;
+
+      const tabs = [...rail.querySelectorAll('.sn-index-tab')];
+      for (let i = 0; i < tabs.length; i += 1) {
+        const label = DEFAULT_TABS[i] || '';
+        if (tabs[i].textContent !== label) tabs[i].textContent = label;
+      }
+
+      let ratio = 0;
+      const range = scroll.scrollHeight - scroll.clientHeight;
+      if (range > 0) ratio = Math.min(1, Math.max(0, scroll.scrollTop / range));
+
+      const page = Math.max(1, Math.min(12, 1 + Math.floor(ratio * 11)));
+      const pageNumber = rail.querySelector('.sn-page-number');
+      const progressText = rail.querySelector('.sn-progress b');
+      if (pageNumber && pageNumber.textContent !== `P.${page}`) {
+        pageNumber.textContent = `P.${page}`;
+      }
+      if (progressText && progressText.textContent !== `${page}/12`) {
+        progressText.textContent = `${page}/12`;
+      }
+
+      const active = Math.max(1, Math.ceil((page / 12) * 5));
+      const dots = rail.querySelectorAll('.sn-progress-dot');
+      dots.forEach((dot, index) => {
+        dot.classList.toggle('is-active', index < active);
+      });
+    }
+
+    function startPageRail() {
+      let stopped = false;
+      let observer = null;
+      let resizeObserver = null;
+      let frame = 0;
+      let timer = 0;
+
+      const updateAll = () => {
+        if (stopped) return;
+        for (const column of document.querySelectorAll(COLUMN_SELECTOR)) {
+          let rail = [...column.children].find((child) => child.classList?.contains(RAIL_CLASS));
+          if (!column.querySelector(FLOW_SELECTOR)) {
+            rail?.remove();
+            continue;
+          }
+          if (!rail) rail = createRail(column);
+          updateRail(column, rail);
+          const scroll =
+            column.closest('[data-conversation-scroll]') ||
+            column.closest('[class*="an3WzG_scrollBody"]');
+          if (scroll && resizeObserver) resizeObserver.observe(scroll);
+        }
+      };
+
+      const schedule = () => {
+        if (stopped || timer) return;
+        timer = window.setTimeout(() => {
+          timer = 0;
+          updateAll();
+        }, 120);
+      };
+
+      const onScroll = () => {
+        if (stopped || frame) return;
+        frame = window.requestAnimationFrame(() => {
+          frame = 0;
+          updateAll();
+        });
+      };
+
+      const onResize = () => {
+        if (stopped) return;
+        schedule();
+      };
+
+      const start = () => {
+        if (stopped) return;
+        observer = new MutationObserver(schedule);
+        observer.observe(document.body, { childList: true, subtree: true });
+        if (typeof ResizeObserver !== 'undefined') {
+          resizeObserver = new ResizeObserver(schedule);
+        }
+        document.addEventListener('scroll', onScroll, true);
+        window.addEventListener('resize', onResize);
+        updateAll();
+      };
+
+      if (document.body) {
+        start();
+      } else if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', start, { once: true });
+      } else {
+        window.requestAnimationFrame(start);
+      }
+
+      return () => {
+        stopped = true;
+        observer?.disconnect();
+        resizeObserver?.disconnect();
+        document.removeEventListener('scroll', onScroll, true);
+        window.removeEventListener('resize', onResize);
+        if (frame) window.cancelAnimationFrame(frame);
+        if (timer) window.clearTimeout(timer);
+        document.querySelectorAll(`.${RAIL_CLASS}`).forEach((rail) => rail.remove());
+      };
+    }
 
     function mount() {
       document.documentElement.setAttribute('data-student-notebook', 'on');
@@ -47,8 +224,11 @@ window.__ModuleLoader__.load({
         requestAnimationFrame(moveToBody);
       }
 
+      const stopPageRail = startPageRail();
+
       return () => {
         disposed = true;
+        stopPageRail();
         style.remove();
         document.documentElement.removeAttribute('data-student-notebook');
       };
