@@ -110,6 +110,30 @@ window.__ModuleLoader__.load({
       dots.forEach((dot, index) => {
         dot.classList.toggle('is-active', index < active);
       });
+
+      // B is the primary rule (wide tables stay in the reading column). This
+      // hit test is the A fallback for a table that still reaches the tabs.
+      const tabsEl = rail.querySelector('.sn-index-tabs');
+      if (tabsEl) {
+        const tabsRect = tabsEl.getBoundingClientRect();
+        const pad = 3;
+        let collision = false;
+        for (const el of column.querySelectorAll('table, .md-table-wide')) {
+          const rect = el.getBoundingClientRect();
+          if (
+            rect.width > 0 &&
+            rect.height > 0 &&
+            rect.right > tabsRect.left - pad &&
+            rect.left < tabsRect.right + pad &&
+            rect.bottom > tabsRect.top - pad &&
+            rect.top < tabsRect.bottom + pad
+          ) {
+            collision = true;
+            break;
+          }
+        }
+        rail.classList.toggle('sn-tabs-hidden', collision);
+      }
     }
 
     function startPageRail() {

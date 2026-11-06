@@ -728,6 +728,14 @@ kbd {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  transition: opacity 0.12s ease, visibility 0.12s ease;
+}
+
+/* A fallback: if any wide table still reaches the tab strip, hide the tabs
+   instead of letting them cover the table. */
+.sn-page-rail.sn-tabs-hidden .sn-index-tabs {
+  opacity: 0;
+  visibility: hidden;
 }
 
 .sn-index-tab {
@@ -1053,6 +1061,20 @@ mark {
   background: var(--sn-paper-raised);
   box-shadow: var(--sn-shadow);
   text-shadow: none;
+}
+
+/* B: reserve the right edge for the index tabs. Wide tables no longer use the
+   full-bleed spare space; they stay inside the reading column and scroll
+   horizontally if their content needs more room. */
+[class*="V4vHZW_column"] .md-table-wide {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+  padding-left: 0;
+  padding-right: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 
 [class*="_markdown_"] thead th:first-child,
